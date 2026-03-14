@@ -88,6 +88,32 @@
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-filesystem", "/path/to/your/projects"],
       "description": "Filesystem operations (set your path)"
+    },
+    "freee": {
+      "command": "node",
+      "args": ["mcp-configs/freee-mcp/server.mjs"],
+      "env": {
+        "FREEE_CLIENT_ID": "${FREEE_CLIENT_ID}",
+        "FREEE_CLIENT_SECRET": "${FREEE_CLIENT_SECRET}"
+      },
+      "description": "freee会計API — 売上・取引・会社情報の取得"
+    },
+    "gdrive": {
+      "command": "node",
+      "args": ["mcp-configs/gdrive-mcp/server.mjs"],
+      "env": {
+        "GOOGLE_CLIENT_ID": "${GOOGLE_CLIENT_ID}",
+        "GOOGLE_CLIENT_SECRET": "${GOOGLE_CLIENT_SECRET}"
+      },
+      "description": "Google Drive — ファイル操作・検索"
+    },
+    "limitless": {
+      "command": "python3",
+      "args": ["mcp-configs/limitedless/limitless_fetch.py"],
+      "env": {
+        "LIMITLESS_API_KEY": "${LIMITLESS_API_KEY}"
+      },
+      "description": "Limitless — 音声ログ・議事録の取得"
     }
   },
   "_comments": {

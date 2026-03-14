@@ -27,6 +27,11 @@ dist/
 # Python
 __pycache__/
 *.pyc
+*.py[cod]
+*$py.class
+*.egg-info/
+venv/
+.venv/
 
 # Task files (Claude Code teams)
 tasks/
@@ -40,3 +45,23 @@ examples/sessions/*.tmp
 
 # Local drafts
 marketing/
+
+# MCP server credentials & tokens
+.mcp.json
+mcp-configs/freee-mcp/.env
+mcp-configs/freee-mcp/.token.json
+mcp-configs/gdrive-mcp/.env
+mcp-configs/limitedless/.env
+mcp-configs/limitedless/audio/
+mcp-configs/limitedless/data/
+
+# Large media files
+*.mp4
+*.webm
+*.mov
+*.avi
+*.mkv
+*.mp3
+*.wav
+*.ogg
+*.pdf

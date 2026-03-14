@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>天地の宮 - Tenchi no Miya | ウガンダ・ガヒザ村プロジェクト</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&family=Shippori+Mincho:wght@400;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            base: '#FDFBF7',   /* Cream White */
+                            earth: '#A65E44',  /* Terracotta/Soil */
+                            green: '#4A6741',  /* Nature Green */
+                            gold: '#C5A059',   /* Muted Gold */
+                            text: '#333333',
+                            light: '#F3F4F6'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Noto Sans JP"', 'sans-serif'],
+                        serif: ['"Shippori Mincho"', 'serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Styles for smooth scrolling and animations */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 1s ease-out, transform 1s ease-out;
+            will-change: opacity, visibility;
+        }
+
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Hero Image Gradient Overlay */
+        .hero-overlay {
+            background: linear-gradient(to bottom, rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.6));
+        }
+    </style>
+</head>
+
+<body class="bg-brand-base text-brand-text font-sans antialiased leading-relaxed">
+
+    <!-- Navigation -->
+    <nav class="fixed w-full z-50 bg-brand-base/90 backdrop-blur-md shadow-sm transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-20">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="#" class="font-serif text-2xl text-brand-earth font-bold tracking-widest">天地の宮</a>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#about"
+                        class="text-gray-600 hover:text-brand-earth transition-colors text-sm tracking-wider">プロジェクトについて</a>
+                    <a href="#experience"
+                        class="text-gray-600 hover:text-brand-earth transition-colors text-sm tracking-wider">体験する</a>
+                    <a href="#village"
+                        class="text-gray-600 hover:text-brand-earth transition-colors text-sm tracking-wider">ガヒザ村</a>
+                    <a href="#contact"
+                        class="bg-brand-earth text-white px-6 py-2 rounded-full hover:bg-brand-green transition-colors duration-300 text-sm tracking-wider shadow-md">参加する</a>
+                </div>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-gray-600 hover:text-brand-earth focus:outline-none">
+                        <i class="fas fa-bars text-2xl"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu Panel -->
+        <div id="mobile-menu" class="hidden md:hidden bg-brand-base absolute w-full shadow-lg">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#about" class="block px-3 py-2 text-gray-600 hover:text-brand-earth">プロジェクトについて</a>
+                <a href="#experience" class="block px-3 py-2 text-gray-600 hover:text-brand-earth">体験する</a>
+                <a href="#village" class="block px-3 py-2 text-gray-600 hover:text-brand-earth">ガヒザ村</a>
+                <a href="#contact" class="block px-3 py-2 text-brand-earth font-bold">参加する</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <header class="relative h-screen flex items-center justify-center overflow-hidden">
+        <!-- Background Image (Lake/Nature placeholder) -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1516426122078-c23e76319801?ixlib=rb-4.0.3&auto=format&fit=crop&w=2068&q=80"
+                alt="Uganda Lake View" class="w-full h-full object-cover">
+            <div class="hero-overlay absolute inset-0"></div>
+        </div>
+
+        <div class="relative z-10 text-center px-4 max-w-4xl mx-auto text-white fade-in-section">
+            <p class="font-serif text-lg md:text-2xl mb-4 tracking-widest text-brand-gold">国際プロジェクト プレ始動</p>
+            <h1 class="font-serif text-4xl md:text-6xl lg:text-7xl font-bold mb-8 leading-tight">
+                「私でよかった」を、<br>
+                ウガンダで見つける。
+            </h1>
+            <p class="text-base md:text-lg mb-10 max-w-2xl mx-auto leading-loose opacity-90">
+                完璧じゃなくていい。<br class="md:hidden">あなたの「好き」や「得意」が、<br>
+                国境を超えて誰かの生きる力に変わる場所。
+            </p>
+            <a href="#about"
+                class="inline-block border border-white text-white px-8 py-3 rounded-full hover:bg-white hover:text-brand-earth transition-all duration-300 tracking-widest text-sm">
+                物語をはじめる
+            </a>
+        </div>
+
+        <!-- Scroll Indicator -->
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-white">
+            <i class="fas fa-chevron-down text-2xl"></i>
+        </div>
+    </header>
+
+    <!-- Message / Philosophy Section -->
+    <section id="about" class="py-24 bg-brand-base relative">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center fade-in-section">
+            <div class="inline-block w-16 h-1 bg-brand-earth mb-8"></div>
+            <h2 class="font-serif text-3xl md:text-4xl text-brand-text mb-12">
+                「求められる私」をお休みして、<br>
+                ありのままのあなたが、誰かの宝物になる。
+            </h2>
+            <div class="space-y-8 text-lg text-gray-600 leading-loose text-left md:text-center">
+                <p>
+                    ここは、ウガンダの湖畔にあるコミュニティ「ガヒザ村」。<br>
+                    この場所では、高度な技術や完璧な成果は必要ありません。
+                </p>
+                <p>
+                    スキルを贈る。それ以上に、<br>
+                    あなたが「あなた」でいることが喜ばれる体験を。
+                </p>
+                <p>
+                    高度な技術より、温かな交流を。<br>
+                    あなたの小さな「できること」が、村にとっては大きな奇跡になります。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Project Phase (Organizer's View) -->
+    <section class="py-20 bg-brand-light">
+        <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-white rounded-2xl shadow-xl overflow-hidden flex flex-col md:flex-row fade-in-section">
+                <div class="md:w-1/2 relative h-64 md:h-auto">
+                    <img src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80"
+                        alt="Collaboration" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-brand-green/20 mix-blend-multiply"></div>
+                </div>
+                <div class="md:w-1/2 p-8 md:p-16 flex flex-col justify-center">
+                    <div class="uppercase tracking-wide text-sm text-brand-earth font-bold mb-2">PROJECT PHASE</div>
+                    <h3 class="font-serif text-2xl md:text-3xl mb-6 text-gray-800">
+                        未来への「実験と検証」の旅
+                    </h3>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        このプロジェクトは、本格的な国際展開を控えた今だけの「練習試合」のような期間です。<br>
+                        海外チームと本格的に協働する前に、まずは安心して試せる場として、実験・検証・試運転を行います。
+                    </p>
+                    <p class="text-gray-600 leading-relaxed border-l-4 border-brand-earth pl-4 italic">
+                        失敗しても大丈夫。<br>
+                        共に歩み、共に育つための、大切なプロローグです。
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience / Skills Section (Participant View) -->
+    <section id="experience" class="py-24 bg-brand-base">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16 fade-in-section">
+                <h2 class="font-serif text-3xl md:text-4xl text-brand-text mb-4">あなたができること</h2>
+                <p class="text-gray-600">専門家レベルでなくても大丈夫。「誰かのために」という想いがあれば、参加できます。</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <!-- Skill Card 1 -->
+                <div
+                    class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-brand-earth fade-in-section">
+                    <div
+                        class="w-14 h-14 bg-brand-earth/10 rounded-full flex items-center justify-center text-brand-earth mb-6">
+                        <i class="fas fa-utensils text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">料理を贈る</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        日本の家庭料理やおやつ作り。言葉が通じなくても、「美味しい」は世界共通の愛の言葉になります。
+                    </p>
+                </div>
+
+                <!-- Skill Card 2 -->
+                <div
+                    class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-brand-green fade-in-section">
+                    <div
+                        class="w-14 h-14 bg-brand-green/10 rounded-full flex items-center justify-center text-brand-green mb-6">
+                        <i class="fas fa-book-reader text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">教育・知恵を贈る</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        計算や読み書き、あるいは生活の知恵。あなたの「当たり前」が、子供たちの未来の扉を開きます。
+                    </p>
+                </div>
+
+                <!-- Skill Card 3 -->
+                <div
+                    class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-brand-gold fade-in-section">
+                    <div
+                        class="w-14 h-14 bg-brand-gold/10 rounded-full flex items-center justify-center text-brand-gold mb-6">
+                        <i class="fas fa-palette text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">アート・表現を贈る</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        絵を描く、歌う、踊る。言葉の壁を超えて、心と心が響き合う瞬間を創り出しましょう。
+                    </p>
+                </div>
+
+                <!-- Skill Card 4 -->
+                <div
+                    class="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 border-t-4 border-gray-400 fade-in-section">
+                    <div class="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center text-gray-600 mb-6">
+                        <i class="fas fa-hands-helping text-2xl"></i>
+                    </div>
+                    <h3 class="font-serif text-xl font-bold mb-3">あなたの「得意」を贈る</h3>
+                    <p class="text-sm text-gray-600 leading-relaxed">
+                        デザイン、片付け、ものづくり...。自分の「得意」を小さなプロジェクトとして提案してください。
+                    </p>
+                </div>
+            </div>
+
+            <!-- Value Proposition Box -->
+            <div
+                class="mt-16 bg-gradient-to-r from-brand-earth to-brand-earth/80 rounded-2xl p-8 md:p-12 text-center text-white shadow-lg max-w-4xl mx-auto fade-in-section">
+                <i class="fas fa-heart text-4xl mb-6 text-brand-gold/80"></i>
+                <h3 class="font-serif text-2xl mb-4">得られるのは、「役立つ私」ではなく「価値ある私」</h3>
+                <p class="leading-relaxed opacity-90">
+                    自分のスキルが誰かの役に立つ実感。<br>
+                    ガヒザ村で過ごす中で得られる人生のヒントや気づき。<br>
+                    そして何より、自己愛が深まる体験があなたを待っています。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gahiza Village Section -->
+    <section id="village" class="py-24 relative overflow-hidden">
+        <div class="absolute inset-0 z-0">
+            <img src="https://images.unsplash.com/photo-1489440543286-a69330151c0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+                alt="Nature Background" class="w-full h-full object-cover opacity-10">
+        </div>
+
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="flex flex-col lg:flex-row items-center gap-12">
+                <div class="lg:w-1/2 fade-in-section">
+                    <div class="relative">
+                        <img src="https://images.unsplash.com/photo-1596401057633-5656538431c0?ixlib=rb-4.0.3&auto=format&fit=crop&w=1632&q=80"
+                            alt="Gahiza Village Community" class="rounded-lg shadow-2xl z-10 relative">
+                        <!-- Decorative border -->
+                        <div
+                            class="absolute -bottom-6 -right-6 w-full h-full border-2 border-brand-earth/30 rounded-lg -z-0 hidden md:block">
+                        </div>
+                    </div>
+                </div>
+                <div class="lg:w-1/2 fade-in-section">
+                    <span class="text-brand-earth font-bold tracking-widest uppercase mb-2 block">The Place</span>
+                    <h2 class="font-serif text-4xl mb-6">天地の宮<br><span class="text-2xl text-gray-500">ウガンダ・ガヒザ村</span>
+                    </h2>
+                    <p class="text-gray-600 mb-6 leading-relaxed">
+                        ガヒザ村は、ウガンダの美しい湖畔にあるコミュニティです。
+                        豊かな自然に囲まれ、人々は素朴でありながら力強く生きています。
+                    </p>
+                    <p class="text-gray-600 mb-8 leading-relaxed">
+                        ここで暮らす人々と共に時間を過ごすことは、
+                        現代社会で忘れかけていた「生きる喜び」や「つながりの温かさ」を
+                        思い出す旅になるでしょう。
+                    </p>
+                    <ul class="space-y-4">
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check text-brand-green mr-3"></i>
+                            安心・安全な滞在環境
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check text-brand-green mr-3"></i>
+                            現地コーディネーターによるサポート
+                        </li>
+                        <li class="flex items-center text-gray-700">
+                            <i class="fas fa-check text-brand-green mr-3"></i>
+                            心洗われる湖畔のロケーション
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section id="contact" class="py-20 bg-brand-earth text-white">
+        <div class="max-w-4xl mx-auto px-4 text-center fade-in-section">
+            <h2 class="font-serif text-3xl md:text-5xl mb-8">天地の宮の始まりに参加しませんか？</h2>
+            <p class="text-lg md:text-xl mb-12 opacity-90 leading-relaxed">
+                今後大きく育っていく国際コミュニティの最初の一歩。<br>
+                スペシャリストとして、あなたの「好き」を携えて来てください。
+            </p>
+            <div class="flex flex-col md:flex-row justify-center gap-4">
+                <a href="#"
+                    class="bg-white text-brand-earth font-bold py-4 px-10 rounded-full hover:bg-brand-gold hover:text-white transition-all duration-300 shadow-lg text-lg">
+                    プロジェクトに応募する
+                </a>
+                <a href="#"
+                    class="border-2 border-white text-white font-bold py-4 px-10 rounded-full hover:bg-white hover:text-brand-earth transition-all duration-300 text-lg">
+                    詳しく話を聞く
+                </a>
+            </div>
+            <p class="mt-8 text-sm opacity-70">※現在は実験・検証フェーズの募集となります。</p>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-gray-400 py-12 border-t border-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center">
+            <div class="mb-6 md:mb-0">
+                <span class="font-serif text-2xl text-brand-base font-bold">天地の宮</span>
+                <p class="text-xs mt-2">ウガンダ・ガヒザ村プロジェクト事務局</p>
+            </div>
+            <div class="flex space-x-6">
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-instagram text-xl"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fab fa-facebook text-xl"></i></a>
+                <a href="#" class="hover:text-white transition-colors"><i class="fas fa-envelope text-xl"></i></a>
+            </div>
+        </div>
+        <div class="text-center mt-10 text-xs text-gray-600">
+            &copy; 2024 Tenchi no Miya Project. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- JavaScript for Interactions -->
+    <script>
+        // Mobile Menu Toggle
+        const btn = document.getElementById('mobile-menu-btn');
+        const menu = document.getElementById('mobile-menu');
+
+        btn.addEventListener('click', () => {
+            menu.classList.toggle('hidden');
+        });
+
+        // Close mobile menu when clicking a link
+        menu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                menu.classList.add('hidden');
+            });
+        });
+
+        // Navbar Background on Scroll
+        const navbar = document.getElementById('navbar');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) {
+                navbar.classList.add('shadow-md');
+                navbar.classList.replace('bg-brand-base/90', 'bg-white/95');
+            } else {
+                navbar.classList.remove('shadow-md');
+                navbar.classList.replace('bg-white/95', 'bg-brand-base/90');
+            }
+        });
+
+        // Intersection Observer for Fade-in Animations
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('is-visible');
+                    observer.unobserve(entry.target); // Only animate once
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+
+</html>

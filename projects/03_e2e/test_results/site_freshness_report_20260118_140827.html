@@ -1,0 +1,62 @@
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Site Freshness Check Report</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 20px; background-color: #f9f9f9; }
+            h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
+            table { border-collapse: collapse; width: 100%; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+            th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+            th { background-color: #3498db; color: white; }
+            tr:nth-child(even) { background-color: #f8f9fa; }
+            tr:hover { background-color: #e9ecef; }
+            .status-pass { color: #27ae60; font-weight: bold; }
+            .status-fail { color: #c0392b; font-weight: bold; }
+            .status-error { color: #e67e22; font-weight: bold; }
+            .screenshot-img { max-width: 150px; border: 1px solid #ddd; padding: 2px; }
+            .diff-info { color: #e74c3c; font-size: 0.9em; }
+        </style>
+    </head>
+    <body>
+        <h1>Site Freshness Check Report</h1>
+        <p>Generated at: 2026-01-18 14:08:27</p>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>Site Name</th>
+                    <th>URL</th>
+                    <th>Status</th>
+                    <th>Extracted Data</th>
+                    <th>Visual Diff</th>
+                    <th>Screenshot</th>
+                </tr>
+            </thead>
+            <tbody>
+    
+                <tr>
+                    <td>Example Domain</td>
+                    <td><a href="https://example.com">https://example.com</a></td>
+                    <td class="status-pass">PASS</td>
+                    <td>Example Domain</td>
+                    <td>-</td>
+                    <td><a href="Example Domain_20260118_140813.png" target="_blank"><img src="Example Domain_20260118_140813.png" class="screenshot-img"></a></td>
+                </tr>
+        
+                <tr>
+                    <td>Python.org</td>
+                    <td><a href="https://www.python.org">https://www.python.org</a></td>
+                    <td class="status-pass">PASS</td>
+                    <td>Python is a programming language that lets you work quickly
+and integrate systems more effectively. Learn More</td>
+                    <td>-</td>
+                    <td><a href="Python.org_20260118_140817.png" target="_blank"><img src="Python.org_20260118_140817.png" class="screenshot-img"></a></td>
+                </tr>
+        
+            </tbody>
+        </table>
+    </body>
+    </html>
+    

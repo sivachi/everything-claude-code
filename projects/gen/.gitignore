@@ -1,0 +1,29 @@
+# APIキー・環境変数
+.env
+*.env
+
+# 出力ファイル（全て再生成可能なので除外）
+output/
+
+# 元データ（シンボリックリンク先の実体）
+data/raw/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+*.egg-info/
+
+# macOS
+.DS_Store
+
+# Streamlit
+.streamlit/
+
+# HuggingFace キャッシュ
+*.cache/
+
+# ログ
+*.log
+/tmp/

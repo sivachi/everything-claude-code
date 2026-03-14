@@ -1,0 +1,144 @@
+nいいですね。じゃあ“短く・具体的・配布向け”の形で、手を動かす順に一枚に落とします。
+（コマンドは Windows/mac と Linux の両方を併記。`python` は環境により `py` / `python3` に読み替え。）
+
+---
+
+# Kindle キャプチャ → OCR までの最短手順（配布用）
+
+> できること：**Kindleアプリのページを自動キャプチャ→PDF化→OCRで検索・コピー可能化**
+> 注意：DRMや規約に反する用途は不可。個人の正当な範囲で。
+
+## 0) 初回だけやるセットアップ（約5分）
+
+1. **Python 3.10+** を用意（既にある場合はスキップ）
+2. **Tesseract OCR** と **Poppler** を入れる
+
+   * **Windows**：UB Mannheim版 Tesseract（Japanese含む）をインストール → `C:\Program Files\Tesseract-OCR\` を PATH へ。Poppler を解凍して `...\bin` を PATH へ。
+     確認：`tesseract --version` / `pdfinfo -v`
+   * **macOS**：`brew install tesseract poppler`
+   * **Ubuntu/Debian**：`sudo apt-get install -y tesseract-ocr tesseract-ocr-jpn poppler-utils`
+3. **Python依存**（一行）
+
+   ```bash
+   python -m pip install Pillow pyautogui pygetwindow pytesseract pypdf pdf2image opencv-python numpy tqdm PyMuPDF
+   ```
+
+---
+
+## 1) 実行の準備（毎回）
+
+* **Kindleアプリを開く** → 対象の本を表示
+
+  * 1ページ表示／ズーム固定（**100%推奨**）、ツールバー非表示
+  * ページ送りキー（→/←/Space など）を把握
+  * 最初に撮るページを表示しておく
+* **macOSのみ**：システム設定 → プライバシーとセキュリティ → **アクセシビリティ** と **画面収録** に Terminal/Python/エディタを追加（PyAutoGUI用）
+* **触らない**：キャプチャ中は**キーボード・マウスに触れない**（誤動作防止）
+
+---
+
+## 2) キャプチャ → 画像PDF
+
+> ターミナル（Windowsは PowerShell/CMD）で、スクリプトのあるフォルダに移動して実行。
+
+### 例：最初は少量（5ページ）でテスト
+
+* **Windows**
+
+  ```bat
+  py capture\kindle_capture.py -p 5 -d 2 -o book.pdf
+  ```
+
+* **macOS/Linux**
+
+  ```bash
+  python3 capture/kindle_capture.py -p 5 -d 2 -o book.pdf
+  ```
+
+* `-p` = 撮るページ数（まずは 5 で確認→OKなら全量）
+
+* `-d` = 1枚ごとの待機秒（描画待ち。重い本は 2〜3 に）
+
+> ※ スクリプト名が `Kindle_Capture_Windows.py` 等の場合は読み替え。
+
+---
+
+## 3) OCR 付与 → 検索可能PDF
+
+* **縦書き日本語（書籍向け・推奨）**
+
+  * **Windows**
+
+    ```bat
+    py ocr\pdf_ocr.py book.pdf --preset japanese -l jpn --threads 4 --save-text
+    ```
+  * **macOS/Linux**
+
+    ```bash
+    python3 ocr/pdf_ocr.py book.pdf --preset japanese -l jpn --threads 4 --save-text
+    ```
+* **横書き・日英混在（汎用）**
+
+  ```bash
+  python ocr/pdf_ocr.py book.pdf --preset balanced -l jpn+eng --threads 4 --save-text
+  ```
+
+  （Windowsは `py` / mac・Linuxは `python3`）
+
+**出力**
+
+* `book_ocr.pdf`：見た目そのまま、**検索／コピー可**
+* `book_ocr.txt`：抽出テキスト（`--save-text` 指定時）
+
+**確認**
+
+* `book_ocr.pdf` を開いて **Ctrl/Cmd+F** 検索・文字選択ができればOK
+
+---
+
+## 4) つまずき最小リスト
+
+* **`Tesseract not found`** → Tesseract未導入 or PATH未設定
+
+  * Windows 例：`setx PATH "%PATH%;C:\Program Files\Tesseract-OCR\"`
+  * それでも難しければコードに直書き：
+
+    ```python
+    import pytesseract
+    pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    ```
+* **`Unable to get page count... Is poppler installed`** → Poppler未設定
+
+  * `pdfinfo -v` が動くように PATH を通す、または
+
+    ```python
+    from pdf2image import convert_from_path
+    convert_from_path("book.pdf", dpi=300, poppler_path=r"C:\poppler\bin")  # Windows例
+    ```
+* **macで操作不可／撮れない** → アクセシビリティ＆画面収録の権限付与後、アプリ再起動
+* **ズレる／抜ける** → Kindleを**100%固定**、キャプチャ中は操作しない、`-d` を大きめに
+
+---
+
+## 5) フル実行時のおすすめ手順
+
+1. 上の手順で **5ページテスト**（`-p 5`）
+2. 問題なければ、同じ場所で **全量**（例：`-p 300` など）
+3. OCR は **`--preset`×言語**（`japanese`/`balanced`、`jpn`/`jpn+eng`）を切り替えて最も読めるものを採用
+
+---
+
+### 参考：コマンドだけ一括（貼って使う用）
+
+```bash
+# 依存（初回）
+python -m pip install Pillow pyautogui pygetwindow pytesseract pypdf pdf2image opencv-python numpy tqdm PyMuPDF
+
+# テスト：5ページを2秒間隔で
+python capture/kindle_capture.py -p 5 -d 2 -o book.pdf
+
+# OCR（縦書き日本語）
+python ocr/pdf_ocr.py book.pdf --preset japanese -l jpn --threads 4 --save-text
+```
+
+> `python` はあなたの環境に合わせて `py`（Windows）または `python3`（mac/Linux）に置き換えてください。

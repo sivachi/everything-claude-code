@@ -1,0 +1,17 @@
+{
+  "title": "AI竹尾プロジェクト(人格コピー)",
+  "emoji": "🤔",
+  "metadata": {
+    "isShared": true,
+    "lastViewed": "2026-01-22T21:48:47.514181Z",
+    "createTime": "2025-01-28T14:17:52.259036Z"
+  },
+  "advancedSettings": {
+    "persona": {
+      "type": "PERSONA_TYPE_ANALYST"
+    },
+    "outputFormat": {
+      "style": "OUTPUT_FORMAT_STYLE_VERBOSE"
+    }
+  }
+}

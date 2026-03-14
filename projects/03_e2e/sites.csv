@@ -1,0 +1,3 @@
+site_name,url,date_xpath
+Example Domain,https://example.com,//h1
+Python.org,https://www.python.org,//div[@class='introduction']/p

@@ -1,0 +1,12 @@
+pyautogui==0.9.54
+Pillow==10.3.0
+pypdf==4.2.0
+opencv-python==4.9.0.80
+numpy==1.26.4
+click==8.1.7
+pyyaml==6.0.1
+pytesseract==0.3.10
+keyboard==0.13.5
+tqdm==4.66.4
+pdf2image==1.17.0
+PyMuPDF==1.24.0

@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>3D Soccer PK Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background-color: #87CEEB;
+            touch-action: none;
+            user-select: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        #ui-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .interactive {
+            pointer-events: auto;
+        }
+
+        /* スコアボード */
+        #scoreboard {
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-align: center;
+            align-self: center;
+            backdrop-filter: blur(5px);
+            display: flex;
+            gap: 20px;
+        }
+
+        /* メッセージ表示 */
+        #message-box {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 4rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            text-shadow: 3px 3px 0 #000;
+            opacity: 0;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 10;
+        }
+
+        .msg-goal {
+            color: #FFD700;
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .msg-save {
+            color: #FF4500;
+            transform: translate(-50%, -50%) scale(1.0);
+        }
+
+        .msg-miss {
+            color: #AAAAAA;
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        /* ガイド */
+        #guide {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 1.2rem;
+            animation: pulse 2s infinite;
+            pointer-events: none;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        /* スタート画面 & リザルト画面 */
+        #start-screen,
+        #result-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            color: white;
+        }
+
+        #result-screen {
+            display: none;
+        }
+
+        /* ボタン */
+        .btn {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border: none;
+            padding: 15px 40px;
+            color: white;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+
+            50% {
+                opacity: 1;
+                transform: translateY(-10px);
+            }
+
+            100% {
+                opacity: 0.5;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="game-container">
+        <div id="start-screen" class="interactive">
+            <h1 class="text-4xl md:text-6xl font-bold mb-8 text-yellow-400 drop-shadow-lg">PK STRIKER</h1>
+            <p class="mb-4 text-lg text-gray-200">10回中8回ゴールを決めろ！</p>
+            <p class="mb-8 text-sm text-gray-400">キーパーはランダムに動くぞ</p>
+            <button class="btn" onclick="startGame()">GAME START</button>
+        </div>
+
+        <div id="result-screen" class="interactive">
+            <h1 id="result-title" class="text-6xl font-bold mb-4 drop-shadow-lg">WIN!</h1>
+            <p id="result-score" class="mb-8 text-2xl">SCORE: 8 / 10</p>
+            <button class="btn" onclick="startGame()">PLAY AGAIN</button>
+        </div>
+
+        <div id="ui-layer">
+            <div id="scoreboard">
+                <span class="text-yellow-400">GOALS: <span id="score-val">0</span>/8</span>
+                <span class="text-white">|</span>
+                <span class="text-gray-300">KICK: <span id="attempts-val">0</span>/10</span>
+            </div>
+            <div id="message-box">GOAL!</div>
+            <div id="guide">スワイプしてシュート &#8593;<br><span class="text-sm opacity-80">(スペースキーでリトライ)</span></div>
+        </div>
+    </div>
+
+    <script>
+        // --- ゲーム設定と状態 ---
+        const CONFIG = {
+            ballRadius: 0.22, // 実際のサッカーボールに近いサイズ (Three.jsの単位)
+            goalWidth: 10.0, // ゴール幅を拡大 (7.32 -> 10.0)
+            goalHeight: 3.2, // ゴール高さを拡大 (2.44 -> 3.2)
+            goalDepth: 2.0,
+            keeperSpeed: 0.12, // ランダム移動なので少し速度を戻す
+            gravity: 0.015,
+            friction: 0.98,
+            powerMultiplier: 0.04
+        };
+
+        let state = {
+            score: 0,
+            attempts: 0,
+            isShooting: false,
+            ballVelocity: new THREE.Vector3(),
+            isGameActive: false,
+            keeperTargetX: 0,
+            resetTimer: null,
+            isGameOver: false
+        };
+
+        // --- Three.js 変数 ---
+        let scene, camera, renderer;
+        let ball, keeper, goalGroup, netMesh;
+        let field, trajectoryLine;
+        let particles = []; // ゴール時のパーティクル
+
+        // マウス/タッチ操作用
+        let input = {
+            startX: 0,
+            startY: 0,
+            currentX: 0,
+            currentY: 0,
+            isDragging: false
+        };
+
+        // 初期化
+        function init() {
+            // シーン
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x60a0e0); // 少し濃い青空
+            scene.fog = new THREE.Fog(0x60a0e0, 40, 90);
+
+            // カメラ
+            camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+            camera.position.set(0, 1.6, 6); // プレイヤー視点
+            camera.lookAt(0, 0.5, -10);
+
+            // レンダラー
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            document.getElementById('game-container').appendChild(renderer.domElement);
+
+            // ライト
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            dirLight.position.set(10, 20, 10);
+            dirLight.castShadow = true;
+            dirLight.shadow.camera.top = 20;
+            dirLight.shadow.camera.bottom = -20;
+            dirLight.shadow.camera.left = -20;
+            dirLight.shadow.camera.right = 20;
+            scene.add(dirLight);
+
+            createField();
+            createGoal();
+            createKeeper();
+            createBall();
+            createDecorations(); // 広告看板や観客席（簡易）
+            createStadium(); // スタジアム生成
+            createTrajectoryLine(); // 軌道線
+
+            // イベントリスナー
+            window.addEventListener('resize', onWindowResize, false);
+
+            const container = document.getElementById('game-container');
+            container.addEventListener('mousedown', onInputStart);
+            container.addEventListener('mousemove', onInputMove);
+            window.addEventListener('mouseup', onInputEnd);
+
+            container.addEventListener('touchstart', onInputStart, { passive: false });
+            container.addEventListener('touchmove', onInputMove, { passive: false });
+            window.addEventListener('touchend', onInputEnd);
+
+            // スペースキーでリセット（追加）
+            window.addEventListener('keydown', (e) => {
+                if (e.code === 'Space') {
+                    if (state.isGameOver) {
+                        startGame(); // ゲームオーバー時はリスタート
+                    } else if (state.isGameActive) {
+                        e.preventDefault();
+                        clearTimeout(state.resetTimer);
+                        resetBall();
+                    }
+                }
+            });
+
+            animate();
+        }
+
+        // --- オブジェクト作成関数 ---
+
+        function createField() {
+            // 芝生のテクスチャ生成（簡易的）
+            const canvas = document.createElement('canvas');
+            canvas.width = 512;
+            canvas.height = 512;
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#2d5a27';
+            context.fillRect(0, 0, 512, 512);
+
+            // 縞模様
+            context.fillStyle = '#356b2e';
+            for (let i = 0; i < 10; i++) {
+                context.fillRect(0, i * 50, 512, 25);
+            }
+
+            // ノイズを加える
+            for (let i = 0; i < 5000; i++) {
+                context.fillStyle = Math.random() > 0.5 ? '#3a7532' : '#264d21';
+                context.fillRect(Math.random() * 512, Math.random() * 512, 2, 2);
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.wrapT = THREE.RepeatWrapping;
+            texture.repeat.set(10, 10);
+
+            const geometry = new THREE.PlaneGeometry(100, 100);
+            const material = new THREE.MeshStandardMaterial({ map: texture });
+            field = new THREE.Mesh(geometry, material);
+            field.rotation.x = -Math.PI / 2;
+            field.receiveShadow = true;
+            scene.add(field);
+
+            // ペナルティエリアのライン（簡易）
+            const lineMat = new THREE.MeshBasicMaterial({ color: 0xffffff, opacity: 0.8, transparent: true });
+
+            // ゴールライン
+            const goalLine = new THREE.Mesh(new THREE.PlaneGeometry(20, 0.15), lineMat);
+            goalLine.rotation.x = -Math.PI / 2;
+            goalLine.position.set(0, 0.01, -10); // ゴール位置
+            scene.add(goalLine);
+
+            // ペナルティスポット
+            const spot = new THREE.Mesh(new THREE.CircleGeometry(0.1, 16), lineMat);
+            spot.rotation.x = -Math.PI / 2;
+            spot.position.set(0, 0.01, 1); // ボール位置の下
+            scene.add(spot);
+        }
+
+        function createGoal() {
+            goalGroup = new THREE.Group();
+            goalGroup.position.set(0, 0, -10);
+
+            const postMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.5 });
+            const postGeo = new THREE.CylinderGeometry(0.1, 0.1, CONFIG.goalHeight, 16);
+            const crossGeo = new THREE.CylinderGeometry(0.1, 0.1, CONFIG.goalWidth + 0.2, 16);
+
+            // 左ポスト
+            const leftPost = new THREE.Mesh(postGeo, postMat);
+            leftPost.position.set(-CONFIG.goalWidth / 2, CONFIG.goalHeight / 2, 0);
+            leftPost.castShadow = true;
+            goalGroup.add(leftPost);
+
+            // 右ポスト
+            const rightPost = new THREE.Mesh(postGeo, postMat);
+            rightPost.position.set(CONFIG.goalWidth / 2, CONFIG.goalHeight / 2, 0);
+            rightPost.castShadow = true;
+            goalGroup.add(rightPost);
+
+            // クロスバー
+            const crossBar = new THREE.Mesh(crossGeo, postMat);
+            crossBar.rotation.z = Math.PI / 2;
+            crossBar.position.set(0, CONFIG.goalHeight, 0);
+            crossBar.castShadow = true;
+            goalGroup.add(crossBar);
+
+            // ネット（簡易的な半透明ボックス）
+            const netGeo = new THREE.BoxGeometry(CONFIG.goalWidth, CONFIG.goalHeight, CONFIG.goalDepth);
+            // 後ろの面だけ見えるようにするなどの工夫もできるが、今回は半透明グレーで
+            const netMat = new THREE.MeshBasicMaterial({ color: 0xcccccc, wireframe: true, transparent: true, opacity: 0.3 });
+            const net = new THREE.Mesh(netGeo, netMat);
+            net.position.set(0, CONFIG.goalHeight / 2, -CONFIG.goalDepth / 2);
+            goalGroup.add(net);
+
+            scene.add(goalGroup);
+        }
+
+        function createBall() {
+            // サッカーボールのテクスチャ（プロシージャル生成）
+            const canvas = document.createElement('canvas');
+            canvas.width = 256;
+            canvas.height = 128; // 球体展開図比率
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 256, 128);
+
+            // 五角形の模様（簡易的な黒丸で代用）
+            ctx.fillStyle = '#222222';
+            for (let i = 0; i < 8; i++) {
+                ctx.beginPath();
+                ctx.arc(32 + i * 60, 32, 12, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(i * 60, 96, 12, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            const texture = new THREE.CanvasTexture(canvas);
+            const geometry = new THREE.SphereGeometry(CONFIG.ballRadius, 32, 32);
+            const material = new THREE.MeshStandardMaterial({ map: texture, roughness: 0.4 });
+            ball = new THREE.Mesh(geometry, material);
+            ball.castShadow = true;
+
+            resetBall();
+            scene.add(ball);
+        }
+
+        function createKeeper() {
+            // キーパーはシンプルなボックス構成
+            const geometry = new THREE.BoxGeometry(0.8, 1.8, 0.4);
+            const material = new THREE.MeshStandardMaterial({ color: 0xff4500 }); // オレンジのユニフォーム
+            keeper = new THREE.Mesh(geometry, material);
+            keeper.position.set(0, 0.9, -9.8); // ゴールライン少し前
+            keeper.castShadow = true;
+
+            // 頭
+            const headGeo = new THREE.BoxGeometry(0.4, 0.4, 0.4);
+            const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+            const head = new THREE.Mesh(headGeo, headMat);
+            head.position.set(0, 1.1, 0);
+            keeper.add(head);
+
+            // 髪の毛 (追加)
+            const hairGeo = new THREE.BoxGeometry(0.44, 0.15, 0.44);
+            const hairMat = new THREE.MeshStandardMaterial({ color: 0x331100 });
+            const hair = new THREE.Mesh(hairGeo, hairMat);
+            hair.position.set(0, 0.18, 0); // 頭の少し上
+            head.add(hair);
+
+            // 目 (追加)
+            const eyeGeo = new THREE.BoxGeometry(0.06, 0.06, 0.02);
+            const eyeMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+
+            const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+            leftEye.position.set(-0.1, 0.05, 0.21); // 頭の前面より少し前
+            head.add(leftEye);
+
+            const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+            rightEye.position.set(0.1, 0.05, 0.21);
+            head.add(rightEye);
+
+            // 口 (追加)
+            const mouthGeo = new THREE.BoxGeometry(0.15, 0.04, 0.02);
+            const mouthMat = new THREE.MeshBasicMaterial({ color: 0xaa5555 });
+            const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+            mouth.position.set(0, -0.1, 0.21);
+            head.add(mouth);
+
+            // 手袋
+            const gloveGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+            const gloveMat = new THREE.MeshStandardMaterial({ color: 0xffffff });
+            const leftGlove = new THREE.Mesh(gloveGeo, gloveMat);
+            leftGlove.position.set(-0.5, 0.2, 0.2);
+            const rightGlove = new THREE.Mesh(gloveGeo, gloveMat);
+            rightGlove.position.set(0.5, 0.2, 0.2);
+            keeper.add(leftGlove);
+            keeper.add(rightGlove);
+
+            scene.add(keeper);
+        }
+
+        function createDecorations() {
+            // --- スポンサー看板の作成 ---
+            const createBoard = (text, color, x, z) => {
+                const canvas = document.createElement('canvas');
+                canvas.width = 512;
+                canvas.height = 128;
+                const ctx = canvas.getContext('2d');
+
+                // 背景
+                ctx.fillStyle = color;
+                ctx.fillRect(0, 0, 512, 128);
+
+                // 枠線
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 10;
+                ctx.strokeRect(5, 5, 502, 118);
+
+                // テキスト
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 60px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(text, 256, 64);
+
+                const tex = new THREE.CanvasTexture(canvas);
+                const mat = new THREE.MeshBasicMaterial({ map: tex, side: THREE.DoubleSide });
+                const geo = new THREE.PlaneGeometry(3, 0.8);
+                const mesh = new THREE.Mesh(geo, mat);
+                mesh.position.set(x, 0.4, z);
+                // 少し上向きに傾ける
+                mesh.rotation.x = -0.1;
+                scene.add(mesh);
+            };
+
+            // 看板を配置
+            createBoard("ENERGY DRINK", "#cc0000", -4, -13);
+            createBoard("SPORTS TV", "#0000cc", 0, -13);
+            createBoard("FOOTBALL LIFE", "#008800", 4, -13);
+            createBoard("SUPER SHOES", "#cc8800", -7.5, -12);
+            createBoard("BEST BANK", "#880088", 7.5, -12);
+
+
+            // --- カメラマンの作成 ---
+            const createCameraman = (x, z, angle) => {
+                const group = new THREE.Group();
+                group.position.set(x, 0, z);
+                group.rotation.y = angle;
+
+                // 体 (座っている/膝立ち)
+                const bodyGeo = new THREE.BoxGeometry(0.5, 0.6, 0.5);
+                const bodyMat = new THREE.MeshStandardMaterial({ color: 0x333333 }); // 黒っぽい服
+                const body = new THREE.Mesh(bodyGeo, bodyMat);
+                body.position.y = 0.3;
+                group.add(body);
+
+                // ビブス (報道用ベスト)
+                const vestGeo = new THREE.BoxGeometry(0.52, 0.4, 0.52);
+                const vestMat = new THREE.MeshStandardMaterial({ color: 0xffff00 }); // 黄色いベスト
+                const vest = new THREE.Mesh(vestGeo, vestMat);
+                vest.position.y = 0.35;
+                group.add(vest);
+
+                // 頭
+                const headGeo = new THREE.BoxGeometry(0.25, 0.25, 0.25);
+                const headMat = new THREE.MeshStandardMaterial({ color: 0xffccaa });
+                const head = new THREE.Mesh(headGeo, headMat);
+                head.position.y = 0.75;
+                group.add(head);
+
+                // 帽子
+                const hatGeo = new THREE.BoxGeometry(0.27, 0.05, 0.35);
+                const hatMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+                const hat = new THREE.Mesh(hatGeo, hatMat);
+                hat.position.set(0, 0.88, 0.05);
+                group.add(hat);
+
+                // カメラ本体
+                const camBodyGeo = new THREE.BoxGeometry(0.2, 0.2, 0.3);
+                const camBodyMat = new THREE.MeshStandardMaterial({ color: 0x111111 });
+                const camBody = new THREE.Mesh(camBodyGeo, camBodyMat);
+                camBody.position.set(0, 0.6, 0.4);
+                group.add(camBody);
+
+                // レンズ (望遠)
+                const lensGeo = new THREE.CylinderGeometry(0.08, 0.1, 0.4, 16);
+                const lensMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.2 });
+                const lens = new THREE.Mesh(lensGeo, lensMat);
+                lens.rotation.x = Math.PI / 2;
+                lens.position.set(0, 0.6, 0.7);
+                group.add(lens);
+
+                // 三脚 (簡易)
+                const legGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.6);
+                const legMat = new THREE.MeshBasicMaterial({ color: 0x555555 });
+
+                const leg1 = new THREE.Mesh(legGeo, legMat);
+                leg1.position.set(0, 0.3, 0.4);
+                group.add(leg1);
+
+                scene.add(group);
+            };
+
+            // カメラマンを配置
+            createCameraman(-2.5, -11.5, 0.2); // ゴール左後ろ
+            createCameraman(2.5, -11.5, -0.2); // ゴール右後ろ
+            createCameraman(-6.0, -11.0, 0.4); // 左サイド
+            createCameraman(6.0, -11.0, -0.4); // 右サイド
+        }
+
+        function createStadium() {
+            // 観客席のテクスチャ生成
+            const canvas = document.createElement('canvas');
+            canvas.width = 1024;
+            canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+
+            // 背景（コンクリート）
+            ctx.fillStyle = '#444444';
+            ctx.fillRect(0, 0, 1024, 512);
+
+            // 観客を描画（ノイズで表現）
+            for (let y = 50; y < 512; y += 8) {
+                for (let x = 0; x < 1024; x += 6) {
+                    // ランダムな服の色
+                    const r = Math.random();
+                    if (r < 0.3) ctx.fillStyle = '#dd3333'; // 赤チーム
+                    else if (r < 0.6) ctx.fillStyle = '#ffffff'; // 白シャツ
+                    else if (r < 0.8) ctx.fillStyle = '#3333dd'; // 青チーム
+                    else ctx.fillStyle = '#222222'; // その他
+
+                    // 少しばらつきを持たせる
+                    if (Math.random() > 0.1) {
+                        ctx.fillRect(x + Math.random() * 2, y + Math.random() * 2, 4, 6);
+                    }
+                }
+            }
+
+            // 階層の区切り線
+            ctx.fillStyle = '#222222';
+            ctx.fillRect(0, 200, 1024, 10);
+            ctx.fillRect(0, 350, 1024, 10);
+
+            const texture = new THREE.CanvasTexture(canvas);
+            texture.wrapS = THREE.RepeatWrapping;
+            texture.repeat.set(4, 1); // テクスチャを繰り返す
+
+            // 円筒形のスタジアムジオメトリ
+            // 上が開いた円筒
+            const geometry = new THREE.CylinderGeometry(60, 60, 40, 32, 1, true);
+            const material = new THREE.MeshBasicMaterial({
+                map: texture,
+                side: THREE.BackSide, // 内側を描画
+                fog: true
+            });
+
+            const stadium = new THREE.Mesh(geometry, material);
+            stadium.position.set(0, 10, 0); // 地面より少し浮かせて配置（下部は広告などで隠す想定）
+            scene.add(stadium);
+        }
+
+        function createTrajectoryLine() {
+            // 軌道予測用のライン
+            const points = [];
+            for (let i = 0; i < 40; i++) {
+                points.push(new THREE.Vector3(0, 0, 0));
+            }
+            // 線を少し太く見せるためにBufferGeometryを使用
+            const geometry = new THREE.BufferGeometry().setFromPoints(points);
+            // 点線ではなく実線で見やすくする、黄色
+            const material = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 });
+            trajectoryLine = new THREE.Line(geometry, material);
+            trajectoryLine.visible = false;
+            // 手前に表示されるように深度テストをオフにするか考慮するが、
+            // 3D空間にあることを重視してデフォルトのままにする
+            scene.add(trajectoryLine);
+        }
+
+        function createConfetti() {
+            // 紙吹雪パーティクル
+            for (let i = 0; i < 50; i++) {
+                const geo = new THREE.PlaneGeometry(0.1, 0.1);
+                const mat = new THREE.MeshBasicMaterial({
+                    color: Math.random() * 0xffffff,
+                    side: THREE.DoubleSide
+                });
+                const p = new THREE.Mesh(geo, mat);
+                p.position.set(
+                    (Math.random() - 0.5) * CONFIG.goalWidth,
+                    CONFIG.goalHeight + Math.random(),
+                    -10
+                );
+                p.vel = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.1,
+                    (Math.random() * 0.2),
+                    (Math.random() - 0.5) * 0.1
+                );
+                p.rotVel = new THREE.Vector3(
+                    Math.random() * 0.2, Math.random() * 0.2, Math.random() * 0.2
+                );
+                scene.add(p);
+                particles.push(p);
+            }
+        }
+
+        // --- ゲームロジック ---
+
+        function startGame() {
+            document.getElementById('start-screen').style.display = 'none';
+            document.getElementById('result-screen').style.display = 'none';
+            state.isGameActive = true;
+            state.isGameOver = false;
+            state.score = 0;
+            state.attempts = 0;
+            updateScoreBoard();
+            resetBall();
+        }
+
+        function resetBall() {
+            if (state.isGameOver) return;
+
+            ball.position.set(0, CONFIG.ballRadius, 1); // スタート位置
+            ball.rotation.set(0, 0, 0);
+            state.ballVelocity.set(0, 0, 0);
+            state.isShooting = false;
+
+            // キーパーを中央に戻す
+            keeper.position.x = 0;
+            keeper.position.y = 0.9; // Y位置もリセット
+            keeper.rotation.z = 0;   // 回転リセット
+            keeper.rotation.x = 0;
+
+            // メッセージを消す
+            const msgBox = document.getElementById('message-box');
+            msgBox.style.opacity = '0';
+            msgBox.className = '';
+
+            // ガイド表示
+            document.getElementById('guide').style.opacity = '1';
+
+            // 軌道を消す
+            if (trajectoryLine) trajectoryLine.visible = false;
+
+            // パーティクル削除
+            particles.forEach(p => scene.remove(p));
+            particles = [];
+        }
+
+        function updateTrajectory(dx, dy) {
+            if (!trajectoryLine) return;
+
+            // シュート時と同じ物理計算を使って軌道をシミュレート
+            const power = Math.min(Math.abs(dy) * CONFIG.powerMultiplier, 0.8);
+            const angleX = dx * 0.005;
+            const heightPower = Math.abs(dy) * 0.0015;
+
+            // シミュレーション用の仮変数
+            let simPos = ball.position.clone();
+            let simVel = new THREE.Vector3(angleX, heightPower, -power);
+
+            const points = [];
+            const steps = 30; // 予測するステップ数
+
+            for (let i = 0; i < steps; i++) {
+                points.push(simPos.clone());
+
+                // 物理更新
+                simVel.y -= CONFIG.gravity;
+                simPos.add(simVel);
+
+                // 地面判定
+                if (simPos.y <= CONFIG.ballRadius) {
+                    simPos.y = CONFIG.ballRadius;
+                    simVel.y *= -0.6; // バウンド
+                }
+            }
+
+            trajectoryLine.geometry.setFromPoints(points);
+            trajectoryLine.visible = true;
+        }
+
+        function onInputStart(e) {
+            if (!state.isGameActive || state.isShooting) return;
+
+            input.isDragging = true;
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            input.startX = clientX;
+            input.startY = clientY;
+
+            document.getElementById('guide').style.opacity = '0';
+        }
+
+        function onInputMove(e) {
+            if (!input.isDragging) return;
+
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            input.currentX = clientX;
+            input.currentY = clientY;
+
+            // 軌道更新
+            const dx = input.currentX - input.startX;
+            const dy = input.currentY - input.startY;
+
+            // ある程度上にドラッグしている場合のみ軌道を表示
+            if (dy < -10) {
+                updateTrajectory(dx, dy);
+            } else {
+                if (trajectoryLine) trajectoryLine.visible = false;
+            }
+        }
+
+        function onInputEnd(e) {
+            if (!input.isDragging) return;
+            input.isDragging = false;
+
+            if (trajectoryLine) trajectoryLine.visible = false;
+
+            // ベクトル計算
+            const dx = input.currentX - input.startX;
+            const dy = input.currentY - input.startY; // 下から上へのドラッグはマイナス
+
+            // シュート判定（ある程度の距離ドラッグしたら）
+            if (dy < -30) {
+                shoot(dx, dy);
+            } else {
+                // キャンセル扱い
+                document.getElementById('guide').style.opacity = '1';
+            }
+        }
+
+        function shoot(dx, dy) {
+            state.isShooting = true;
+            state.attempts++;
+            updateScoreBoard();
+
+            // 速度計算 (dxは左右、dyは高さと強さ)
+            // 画面座標系から3D座標系への変換は簡易的な係数で行う
+            const power = Math.min(Math.abs(dy) * CONFIG.powerMultiplier, 0.8); // 最大速度制限
+            const angleX = dx * 0.005;
+            const heightPower = Math.abs(dy) * 0.0015;
+
+            state.ballVelocity.set(angleX, heightPower, -power);
+
+            // キーパーの挙動変更：ランダムに飛ぶ (右・左・中央)
+            const rand = Math.random();
+            if (rand < 0.33) {
+                // 左へ飛ぶ (マイナス方向)
+                state.keeperTargetX = -3.5;
+            } else if (rand < 0.66) {
+                // 右へ飛ぶ (プラス方向)
+                state.keeperTargetX = 3.5;
+            } else {
+                // 中央にとどまる
+                state.keeperTargetX = 0;
+            }
+        }
+
+        function checkCollision() {
+            // 1. 地面との衝突
+            if (ball.position.y <= CONFIG.ballRadius) {
+                ball.position.y = CONFIG.ballRadius;
+                state.ballVelocity.y *= -0.6; // バウンド係数
+                state.ballVelocity.z *= CONFIG.friction;
+                state.ballVelocity.x *= CONFIG.friction;
+            }
+
+            // 2. ゴールネット/ライン判定
+            if (ball.position.z < -10 && ball.position.z > -12) {
+                // ゴール枠内か？
+                const inGoalX = Math.abs(ball.position.x) < CONFIG.goalWidth / 2;
+                const inGoalY = ball.position.y < CONFIG.goalHeight;
+
+                if (inGoalX && inGoalY) {
+                    // ポストに当たったか判定（簡易）
+                    const hitPost = Math.abs(Math.abs(ball.position.x) - CONFIG.goalWidth / 2) < 0.3;
+                    const hitBar = Math.abs(ball.position.y - CONFIG.goalHeight) < 0.3;
+
+                    if (hitPost || hitBar) {
+                        // ポスト直撃（跳ね返る）
+                        state.ballVelocity.z *= -0.5;
+                        playSound('post'); // 音は実装しないがコメントとして残す
+                    } else {
+                        return 'GOAL';
+                    }
+                } else {
+                    return 'MISS';
+                }
+            } else if (ball.position.z < -13) {
+                return 'MISS';
+            }
+
+            // 3. キーパーとの衝突（距離ベースに変更）
+            // キーパーのZ位置は -9.8
+            if (ball.position.z < -9.0 && ball.position.z > -10.5) {
+                // 中心点同士の距離で判定（ダイビング対応のため）
+                // キーパーの体サイズを考慮して判定距離を設定 (体長〜1.8mの半分 + ボール半径 + 余白)
+                const dist = ball.position.distanceTo(keeper.position);
+
+                // ダイビング中は横に広がるので、少し甘めの判定にする
+                if (dist < 1.3) {
+                    state.ballVelocity.z *= -0.5; // 前に弾く
+
+                    // 弾く方向を計算
+                    const pushDir = ball.position.clone().sub(keeper.position).normalize();
+                    state.ballVelocity.x += pushDir.x * 0.2;
+                    state.ballVelocity.y += pushDir.y * 0.2;
+
+                    return 'SAVED';
+                }
+            }
+
+            return null;
+        }
+
+        function showMessage(type) {
+            const msgBox = document.getElementById('message-box');
+            let text = "";
+            let colorClass = "";
+
+            if (type === 'GOAL') {
+                text = "GOAL!!";
+                colorClass = "msg-goal";
+                state.score++;
+                createConfetti();
+            } else if (type === 'SAVED') {
+                text = "SAVED!";
+                colorClass = "msg-save";
+            } else {
+                text = "MISS...";
+                colorClass = "msg-miss";
+            }
+
+            updateScoreBoard();
+            msgBox.textContent = text;
+            msgBox.className = colorClass;
+            msgBox.style.opacity = '1';
+
+            // 勝敗判定
+            checkGameResult();
+
+            if (!state.isGameOver) {
+                // 数秒後にリセット
+                clearTimeout(state.resetTimer);
+                state.resetTimer = setTimeout(() => {
+                    resetBall();
+                }, 2500);
+            }
+        }
+
+        function checkGameResult() {
+            // 勝利判定: 8点以上
+            if (state.score >= 8) {
+                endGame(true);
+                return;
+            }
+
+            // 敗北判定: 残りの回数を全部決めても8点に届かない場合
+            // 残り回数 = 10 - state.attempts
+            // 最高可能スコア = state.score + (10 - state.attempts)
+            if (state.score + (10 - state.attempts) < 8) {
+                endGame(false);
+                return;
+            }
+
+            // 10回蹴り終わって決着がつかない場合
+            if (state.attempts >= 10 && state.score < 8) {
+                endGame(false);
+                return;
+            }
+        }
+
+        function endGame(isWin) {
+            state.isGameOver = true;
+            state.isGameActive = false;
+
+            // 少し待ってから結果画面表示
+            setTimeout(() => {
+                const resultScreen = document.getElementById('result-screen');
+                const title = document.getElementById('result-title');
+                const scoreText = document.getElementById('result-score');
+
+                resultScreen.style.display = 'flex';
+                if (isWin) {
+                    title.textContent = "YOU WIN!";
+                    title.className = "text-6xl font-bold mb-4 drop-shadow-lg text-yellow-400";
+                } else {
+                    title.textContent = "GAME OVER";
+                    title.className = "text-6xl font-bold mb-4 drop-shadow-lg text-gray-400";
+                }
+                scoreText.textContent = `SCORE: ${state.score} / 10`;
+            }, 2000);
+        }
+
+        function updateScoreBoard() {
+            document.getElementById('score-val').textContent = state.score;
+            document.getElementById('attempts-val').textContent = state.attempts;
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+
+            if (state.isGameActive && state.isShooting) {
+                // 物理演算
+                state.ballVelocity.y -= CONFIG.gravity;
+                ball.position.add(state.ballVelocity);
+
+                // ボールの回転（移動量に応じて）
+                ball.rotation.x += state.ballVelocity.z;
+                ball.rotation.z -= state.ballVelocity.x;
+
+                // キーパーの移動 (Lerpでターゲットへ近づく)
+                if (ball.position.z > -10) { // まだゴールしていない時だけ動く
+                    const kSpeed = CONFIG.keeperSpeed;
+
+                    // X方向移動
+                    if (keeper.position.x < state.keeperTargetX) keeper.position.x += kSpeed;
+                    if (keeper.position.x > state.keeperTargetX) keeper.position.x -= kSpeed;
+
+                    // ダイビング演出（横跳び）
+                    const diveThreshold = 1.0; // 中央からどれくらい離れたら飛ぶか
+
+                    if (Math.abs(state.keeperTargetX) > diveThreshold) {
+                        // ターゲットが右なら右へ(-Z回転)、左なら左へ(+Z回転)
+                        const targetAngle = (state.keeperTargetX > 0) ? -Math.PI / 2.2 : Math.PI / 2.2;
+
+                        // 回転を滑らかに
+                        keeper.rotation.z = THREE.MathUtils.lerp(keeper.rotation.z, targetAngle, 0.1);
+
+                        // 少しジャンプさせる（重心を上げる）
+                        // 回転すると重心が下がるため、Yを上げて補正しつつジャンプ感を出す
+                        keeper.position.y = THREE.MathUtils.lerp(keeper.position.y, 1.4, 0.05);
+                    } else {
+                        // 中央付近なら棒立ちのまま少し位置調整
+                        keeper.rotation.z = THREE.MathUtils.lerp(keeper.rotation.z, 0, 0.1);
+                        keeper.position.y = THREE.MathUtils.lerp(keeper.position.y, 0.9, 0.1);
+                    }
+                }
+
+                // 衝突判定と結果
+                // まだ結果が出ていない場合のみチェック（連続トリガー防止）
+                if (document.getElementById('message-box').style.opacity === '0') {
+                    const result = checkCollision();
+                    if (result) {
+                        showMessage(result);
+                    }
+                }
+            }
+
+            // パーティクルアニメーション
+            particles.forEach((p, idx) => {
+                p.position.add(p.vel);
+                p.rotation.x += p.rotVel.x;
+                p.rotation.y += p.rotVel.y;
+                p.vel.y -= 0.005; // 重力
+                if (p.position.y < 0) {
+                    p.vel.y *= -0.5;
+                    p.position.y = 0;
+                }
+            });
+
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // ゲーム初期化
+        init();
+
+    </script>
+</body>
+
+</html>
