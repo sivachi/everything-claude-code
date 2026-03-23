@@ -10,7 +10,7 @@ Project GEN - 再集約 Fix版
 import json, os, re, time, datetime, anthropic
 from pathlib import Path
 
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
 OUTPUT_DIR  = BASE_DIR / "output"
 PHASE1_FILE = OUTPUT_DIR / "在り方_phase1_v3.json"   # Phase1の保存済み（1,194件）
 ARIKATA_MD  = BASE_DIR / "玄_在り方.md"

@@ -1,6 +1,6 @@
 
 import dotenv from "dotenv";
-import { ElevenLabsClient } from "elevenlabs";
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import Replicate from "replicate";
 import fs from "node:fs";
 import path from "node:path";
@@ -63,32 +63,8 @@ const SCENES = [
     }
 ];
 
-// Voice IDs
-// The user requested "Clutch" for the narrator.
-// We will try to find a voice named "Clutch" or similar.
-// If not found, we will fall back to a deep male voice.
-
-const VOICE_IDS = [
-    "E7YvDy47DfETMlqyHdLS", // Narrator
-    "ErXwobaYiN019PkySvjV"  // Organizer (Antoni)
-];
-
-// To find "Clutch", we should probably list available voices first.
-// Let's add a helper to find the voice ID by name.
-
-async function getVoiceIdByName(name: string): Promise<string | undefined> {
-    try {
-        const voices = await elevenlabs.voices.getAll();
-        const voice = voices.voices.find(v => v.name.toLowerCase().includes(name.toLowerCase()));
-        return voice?.voice_id;
-    } catch (e) {
-        console.error("Error fetching voices:", e);
-        return undefined;
-    }
-}
-
-
-const MODEL_ID = "eleven_multilingual_v2";
+// eleven_turbo_v2_5: cheaper & faster than multilingual_v2, supports Japanese
+const MODEL_ID = "eleven_turbo_v2_5";
 
 // ------------------------------------------------------------------
 // FUNCTIONS
@@ -103,32 +79,22 @@ async function generateAudio(text: string, voiceId: string, outputPath: string) 
     console.log(`Generating audio for: "${text.substring(0, 20)}..."`);
 
     try {
-        const audio = await elevenlabs.generate({
-            voice: voiceId,
+        const audioStream = await elevenlabs.textToSpeech.convert(voiceId, {
             text: text,
-            model_id: MODEL_ID,
+            modelId: MODEL_ID,
+            outputFormat: "mp3_44100_128",
         });
 
-        // Handle audio stream or buffer
-        if (audio instanceof Buffer) {
-            fs.writeFileSync(outputPath, audio);
-        } else if (typeof audio === 'object' && audio !== null && 'pipe' in audio) {
-            // It is a stream
-            const fileStream = fs.createWriteStream(outputPath);
-            (audio as any).pipe(fileStream); // Cast to any to avoid TS issues if types are mismatching
-            await new Promise((resolve, reject) => {
-                fileStream.on("finish", resolve);
-                fileStream.on("error", reject);
-            });
-        } else {
-            // Fallback for newer SDK versions that might return a ReadableStream (web standard) or similar
-            const chunks = [];
-            for await (const chunk of audio as any) {
-                chunks.push(chunk);
-            }
-            const buffer = Buffer.concat(chunks);
-            fs.writeFileSync(outputPath, buffer);
+        // The new SDK returns a ReadableStream<Uint8Array>
+        const reader = audioStream.getReader();
+        const chunks: Uint8Array[] = [];
+        while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+            if (value) chunks.push(value);
         }
+        const buffer = Buffer.concat(chunks);
+        fs.writeFileSync(outputPath, buffer);
         console.log(`Audio generated: ${outputPath}`);
 
     } catch (error) {
@@ -145,15 +111,16 @@ async function generateImage(prompt: string, outputPath: string) {
     console.log(`Generating image for prompt: "${prompt}"`);
 
     try {
+        // FLUX Schnell: free tier on Replicate, fast, high quality, supports 16:9
         const output = await replicate.run(
-            "stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b",
+            "black-forest-labs/flux-schnell",
             {
                 input: {
-                    prompt: prompt + ", cinematic, 8k, highly detailed, photorealistic",
-                    negative_prompt: "text, watermark, low quality, blurred, cartoon, anime",
-                    width: 1024,
-                    height: 576,
-                    num_outputs: 1
+                    prompt: prompt + ", cinematic, highly detailed, photorealistic",
+                    aspect_ratio: "16:9",
+                    num_outputs: 1,
+                    output_format: "jpg",
+                    output_quality: 90,
                 }
             }
         );

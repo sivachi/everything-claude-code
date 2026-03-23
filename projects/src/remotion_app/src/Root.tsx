@@ -5,6 +5,7 @@ import { Logo, myCompSchema2 } from "./HelloWorld/Logo";
 import { SimpleHelloWorld } from "./SimpleHelloWorld";
 import { ProfessionalVideo } from "./ProfessionalVideo";
 import { MysteryVideo } from "./MysteryVideo";
+import { StoryVideo } from "./StoryVideo";
 
 
 // Each <Composition> is an entry in the sidebar!
@@ -23,10 +24,18 @@ export const RemotionRoot: React.FC = () => {
       <Composition
         id="MysteryVideo"
         component={MysteryVideo}
-        durationInFrames={1650} // Sum of scene durations
+        durationInFrames={1370} // Sum of scene durations minus transition overlaps
         fps={30}
         width={1920}
         height={1080}
+      />
+      <Composition
+        id="StoryVideo"
+        component={StoryVideo}
+        durationInFrames={450}
+        fps={30}
+        width={1080}
+        height={1920}
       />
 
 

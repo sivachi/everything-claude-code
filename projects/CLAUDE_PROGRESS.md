@@ -9,6 +9,18 @@
 - [ ] なし（新規タスク発生時に追加）
 
 ## 変更履歴
+### 2026-03-15（gen精度評価の網羅化）
+- 変更: `projects/gen/scripts/07_rag_eval.py`
+  - 定量評価を追加（キーワード適合度・意味類似度・Chronicle意味類似度・文脈拡張率）
+  - テストケースを8件→16件に拡張して再評価を実施
+  - 評価結果を `projects/gen/output/rag_eval_report.json` / `rag_eval_report.md` に自動出力
+  - Chronicle評価のバイアスを修正（hit数判定から意味類似度判定へ）
+- 変更: `projects/gen/scripts/06_rag_improvements.py`
+  - リランカーを `RRF + CrossEncoder` のハイブリッド再スコアに改善
+  - Chronicle埋め込みキャッシュにエッジ内容ハッシュ検証を追加
+  - `chunk_id` 欠損時の誤文脈展開を防ぐ安全処理を追加
+  - プロファイル保存/読込に安全なファイル名正規化を追加（パストラバーサル対策）
+
 ### 2026-03-15（全プロジェクト統合）
 - 作成: `projects/gen/` — AI竹尾関連を統合（AItakeo + ai_takeo + ai_takeo_local → gen）
   - `gen/scripts/` — データ処理・前処理スクリプト群

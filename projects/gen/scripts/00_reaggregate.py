@@ -11,7 +11,7 @@ Project GEN - 再集約スクリプト
 import json, os, re, time, datetime, anthropic
 from pathlib import Path
 
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
 OUTPUT_DIR  = BASE_DIR / "output"
 INTER_FULL  = OUTPUT_DIR / "在り方_中間抽出_full.json"
 ARIKATA_MD  = BASE_DIR / "玄_在り方.md"

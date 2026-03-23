@@ -24,8 +24,8 @@ from bs4 import BeautifulSoup
 import anthropic
 
 # ── パス設定 ──────────────────────────────────────
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
-SOURCE_DIR  = Path("/Users/tadaakikurata/works/ai_takeo/AI竹尾プロジェクト(人格コピー)/Sources")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
+SOURCE_DIR  = Path("/Users/tadaakikurata/works/claude-code/projects/gen/sources/Sources")
 ARIKATA_MD  = BASE_DIR / "玄_在り方.md"
 OUTPUT_DIR  = BASE_DIR / "output"
 OUTPUT_FILE = OUTPUT_DIR / "在り方_比較レポート.md"

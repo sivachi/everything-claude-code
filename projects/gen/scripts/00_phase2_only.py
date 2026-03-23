@@ -9,7 +9,7 @@ Project GEN - Phase2のみ実行（Phase1b: 348件 → 最終25〜35件）
 import json, os, re, time, datetime, anthropic
 from pathlib import Path
 
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
 OUTPUT_DIR  = BASE_DIR / "output"
 PHASE1B_FILE= OUTPUT_DIR / "在り方_phase1b_v3.json"
 ARIKATA_MD  = BASE_DIR / "玄_在り方.md"

@@ -14,8 +14,8 @@ from bs4 import BeautifulSoup
 from tqdm import tqdm
 
 # ── パス設定 ──────────────────────────────────────
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
-DATA_DIR    = Path("/Users/tadaakikurata/works/ai_takeo/AI竹尾プロジェクト(人格コピー)/Sources")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
+DATA_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen/sources/Sources")
 OUTPUT_DIR  = BASE_DIR / "output"
 ARIKATA_MD  = BASE_DIR / "玄_在り方.md"
 CHECKPOINT  = OUTPUT_DIR / "checkpoint_full.json"

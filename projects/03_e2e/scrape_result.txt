@@ -1,0 +1,37 @@
+--- PAGE URL AFTER LOGIN ---
+https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=sjpTaEfS
+--- LINKS ---
+{'text': '特別授業 0', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=Yri3iK2Z'}
+{'text': '特別授業 01', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=wDDHnF6T'}
+{'text': '特別授業 02', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=TRk7rnEp'}
+{'text': '特別授業 03', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=DNE9B7vB'}
+{'text': '特別授業 04', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=CaDqjmJg'}
+{'text': '特別授業 05', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=DKQulgpz'}
+{'text': '特別授業 06', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=vuOqas2l'}
+{'text': '特別授業 07', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=asNHp49L'}
+{'text': '特別授業 08', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=jxvjZpDU'}
+{'text': '付録', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=Ak4deYzG'}
+{'text': '一覧', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=VFHnPPH1'}
+{'text': 'ツール', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=TGZCS4WB'}
+{'text': '', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/top.html'}
+{'text': 'TOP', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/top.html'}
+{'text': '0', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=Yri3iK2Z'}
+{'text': '01', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=wDDHnF6T'}
+{'text': '02', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=TRk7rnEp'}
+{'text': '03', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=DNE9B7vB'}
+{'text': '04', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=CaDqjmJg'}
+{'text': '05', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=DKQulgpz'}
+{'text': '06', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=vuOqas2l'}
+{'text': '07', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=asNHp49L'}
+{'text': '08', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=jxvjZpDU'}
+{'text': '付録', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=Ak4deYzG'}
+{'text': '一覧', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=VFHnPPH1'}
+{'text': 'ツール', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=TGZCS4WB'}
+{'text': '個人設定', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/setting.html'}
+{'text': 'パスワード変更', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/password.html'}
+{'text': 'ログアウト', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/logout.html'}
+{'text': '＜ 前に戻る', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=sS86IYux'}
+{'text': '次へ進む ＞', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=bvXxCH3J'}
+{'text': 'TOP', 'href': 'https://mentre.net/sp/eDflcMn5/zTRe9jAc/member/page.html?id=sjpTaEfS#'}
+--- IFRAMES ---
+https://player.vimeo.com/video/840535398?h=1a5c2a2111&badge=0&autopause=0&player_id=0&app_id=58479

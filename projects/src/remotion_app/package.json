@@ -6,11 +6,11 @@
   "license": "UNLICENSED",
   "private": true,
   "dependencies": {
+    "@elevenlabs/elevenlabs-js": "^2.39.0",
     "@remotion/cli": "4.0.414",
     "@remotion/tailwind-v4": "4.0.414",
     "@remotion/zod-types": "4.0.414",
     "dotenv": "^17.2.4",
-    "elevenlabs": "^1.59.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "remotion": "4.0.414",

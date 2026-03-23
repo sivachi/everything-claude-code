@@ -45,7 +45,7 @@ import re
 import shutil
 from pathlib import Path
 
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
 CHUNKS_FILE = BASE_DIR / "output" / "chunks.jsonl"
 BACKUP_FILE = BASE_DIR / "output" / "chunks_backup.jsonl"
 

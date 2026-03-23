@@ -39,7 +39,7 @@ from typing import Dict, List
 # ─────────────────────────────────────────────
 # パス設定
 # ─────────────────────────────────────────────
-BASE_DIR    = Path("/Users/tadaakikurata/works/ai_takeo_local")
+BASE_DIR    = Path("/Users/tadaakikurata/works/claude-code/projects/gen")
 CHUNKS_FILE = BASE_DIR / "output" / "chunks.jsonl"
 CHROMA_DIR  = BASE_DIR / "output" / "chroma_db"
 

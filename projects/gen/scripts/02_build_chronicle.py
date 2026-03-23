@@ -9,7 +9,7 @@ GEN (玄) RAGパイプライン — ステップ2: Chronicle Graph 構築
   RAGアプリ（04_app.py）が使いやすい形式で保存する。
 
 入力:
-  /Users/tadaakikurata/works/ai_takeo_local/玄_在り方.md
+  /Users/tadaakikurata/works/claude-code/projects/gen/玄_在り方.md
 
 出力:
   output/chronicle_graph.json   — グラフ全体（ノード + エッジ + メタデータ）
@@ -70,8 +70,8 @@ from collections import Counter
 # ─────────────────────────────────────────────
 # パス設定
 # ─────────────────────────────────────────────
-ARKATA_MD = Path("/Users/tadaakikurata/works/ai_takeo_local/玄_在り方.md")
-OUTPUT_DIR = Path("/Users/tadaakikurata/works/ai_takeo_local/output")
+ARKATA_MD = Path("/Users/tadaakikurata/works/claude-code/projects/gen/玄_在り方.md")
+OUTPUT_DIR = Path("/Users/tadaakikurata/works/claude-code/projects/gen/output")
 OUTPUT_GRAPH    = OUTPUT_DIR / "chronicle_graph.json"
 OUTPUT_SECTIONS = OUTPUT_DIR / "chronicle_sections.json"
 OUTPUT_FULLTEXT = OUTPUT_DIR / "chronicle_full_text.txt"
